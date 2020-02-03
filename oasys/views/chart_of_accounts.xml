@@ -1,0 +1,142 @@
+<odoo>
+    <data>
+
+        <!-- explicit list view definition -->
+
+        <record model="ir.ui.view" id="chart_of_accounts_tree_view">
+            <field name="name">oasys.account.list</field>
+            <field name="model">oasys.account</field>
+            <field name="arch" type="xml">
+                <tree string="Chart of accounts" toolbar="1" >
+                    <field name="deprecated" invisible="1"/>
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="user_type_id"/>
+                    <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency"/>
+                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_account_search" model="ir.ui.view">
+            <field name="name">oasys.account.search</field>
+            <field name="model">oasys.account</field>
+            <field name="arch" type="xml">
+                <search string="Accounts">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('code','=like',str(self)+'%')]" string="Account"/>
+                    <filter string="Receivable Accounts" domain="[('internal_type','=','receivable')]"/>
+                    <filter string="Payable Accounts" domain="[('internal_type','=','payable')]"/>
+                    <field name="user_type_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Account Type" domain="" context="{'group_by':'user_type_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="view_account_form" model="ir.ui.view">
+            <field name="name">oasys.account.form</field>
+            <field name="model">oasys.account</field>
+            <field name="arch" type="xml">
+                <form string="Account">
+                   <sheet>
+                       <group>
+                           <group>
+                             <field name="code" placeholder="code"/>
+                             <field name="name"/>
+                             <field name="user_type_id" widget="selection"/>
+<!--                             <field name="tax_ids" widget="many2many_tags" domain="[('company_id','=',company_id)]"/>-->
+<!--                             <field name="tag_ids" widget="many2many_tags" domain="[('applicability', '!=', 'taxes')]" context="{'default_applicability': 'accounts'}" options="-->
+<!--                             {'no_create_edit': True}"/>-->
+                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                             <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency"/>
+                             <field name="internal_type" invisible="1" readonly="1"/>
+<!--                             <label for="reconcile" attrs="{'invisible': [('internal_type','=','liquidity')]}"/>-->
+<!--                             <div attrs="{'invisible': [('internal_type','=','liquidity')]}">-->
+<!--                                <field name="reconcile"/>-->
+<!--                                <button name="action_open_reconcile" class="oe_link" type="object" string=" -> Reconcile" attrs="{'invisible': [('reconcile', '=', False)]}"/>-->
+<!--                             </div>-->
+                             <field name="deprecated"/>
+                           </group>
+                           <group>
+                               <div class="row">
+                                   <div class="col-md-11 col-md-offset-1 col-sm-12 no-margin-top" style="background-color: #eee">
+                                       <p class="text-center" style="font-weight: bold;">How account type affects your reports?</p>
+                                       <div class="col-md-6 col-sm-6">
+                                           <div class="oe_account_help">
+                                                <p class="oe_account_font_help text-center">Profit &amp; Loss</p>
+                                                <p class="oe_account_font_help oe_account_font_title">Income</p>
+                                                <p class="oe_account_font_help oe_account_font_title">Minus Cost of Revenue</p>
+                                                <p class="oe_account_font_help" style="color: grey;border-top: 2px solid;border-bottom: 2px solid;">GROSS PROFIT</p>
+                                                <p class="oe_account_font_help oe_account_font_title">Plus Other Income</p>
+                                                <p class="oe_account_font_help oe_account_font_title">Minus Expenses</p>
+                                                <p class="oe_account_font_help oe_account_font_content">Expenses</p>
+                                                <p class="oe_account_font_help oe_account_font_content">Depreciation</p>
+                                                <p class="oe_account_font_help" style="color: grey;border-top: 2px solid;border-bottom: 2px solid;">NET PROFIT</p>
+                                                <div style="position: relative; width: 250px; height: 277px;" id="layer">
+                                                   <div style="position: relative; left: 0px; top: 0px; visibility: visible; width: 250px; height: 277px;">
+                                                     <svg pointer-events="none" overflow="auto" width="712.5" height="265" viewBox="-4 -4 712.5 265" style="position: relative; top: -4px; left: -4px; overflow: auto; visibility: visible; width: 400.5px; height: 265px;">
+                                                       <defs>
+                                                         <marker id="arrow" markerWidth="70" markerHeight="70" refx="10" refy="6" orient="auto">
+                                                             <path d="M2,1 L2,12 L10,6 L2,1" stroke="rgb(173,216,230)" fill="rgb(173,216,230)"/>
+                                                         </marker>
+                                                       </defs>
+                                                       <path pointer-events="visiblePainted" shape-rendering="auto" d="M 150 -110 q 270 100 150 150 t 160 120" fill="none" stroke-dasharray="8,3" stroke="rgb(173,216,230)" stroke-linecap="butt" stroke-width="4" stroke-opacity="1" stroke-linejoin="round" transform="matrix(1,0,0,1,0,0)" fill-opacity="1" style="marker-end: url(#arrow);">
+                                                       </path>
+                                                     </svg>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <div class="col-md-6 col-sm-6">
+                                           <div class="oe_account_help">
+                                               <p class="oe_account_font_help text-center">Balance Sheet</p>
+                                               <p class="oe_account_font_help oe_account_font_title" style="color: grey;">Current Assets</p>
+                                               <p class="oe_account_font_help oe_account_font_content">Receivable Accounts</p>
+                                               <p class="oe_account_font_help oe_account_font_content">Prepayments</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Plus Bank</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Plus Fixed Assets</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Plus Non-Current Assets</p>
+                                               <p class="oe_account_font_help" style="color: grey;border-top: 2px solid;border-bottom: 2px solid;">TOTAL ASSETS</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Minus Current Liabilities</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Minus Credit Card Accounts</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Minus Payable Accounts</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Minus Non-Current Liabilities</p>
+                                               <p class="oe_account_font_help" style="color: grey;border-top: 2px solid;border-bottom: 2px solid;">NET ASSETS</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Equity</p>
+                                               <p class="oe_account_font_help oe_account_font_title">Plus Net Profit</p>
+                                               <p class="oe_account_font_help" style="color: grey;border-top: 2px solid;border-bottom: 2px solid;">TOTAL EQUITY</p>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </group>
+                       </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="oasys.action_window_chart_of_accounts">
+            <field name="name">Chart of Accounts</field>
+            <field name="res_model">oasys.account</field>
+<!--            <field name="context">{'group_by':['date:year']}</field>-->
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="chart_of_accounts_tree_view"/>
+            <field name="search_view_id" ref="view_account_search"/>
+            <field name="domain">[('company_id.user_ids.id','=',uid)]</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add an account.
+              </p><p>
+                An account is part of a ledger allowing your company
+                to register all kinds of debit and credit transactions.
+                Companies present their annual accounts in two main parts: the
+                balance sheet and the income statement (profit and loss
+                account). The annual accounts of a company are required by law
+                to disclose a certain amount of information.
+              </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

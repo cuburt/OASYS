@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="account_type_tree_view" model="ir.ui.view">
+            <field name="name">oasys.account.type.list</field>
+            <field name="model">oasys.account.type</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="account_type_form_view" model="ir.ui.view">
+            <field name="name">oasys.account.type.form</field>
+            <field name="model">oasys.account.type</field>
+            <field name="arch" type="xml">
+                <form string="Account Type">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" class="oe_inline"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type"/>
+                            </group>
+                            <group>
+                                <field name="description"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_account_types" model="ir.actions.act_window">
+            <field name="name">Account Types</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.account.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="account_type_tree_view"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+
+        <record id="tax_tree_view" model="ir.ui.view">
+            <field name="name">oasys.tax.list</field>
+            <field name="model">oasys.tax</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="type_tax_use"/>
+                    <field name="description" string="Short Name"/>
+                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="tax_form_view" model="ir.ui.view">
+            <field name="name">oasys.tax.form</field>
+            <field name="model">oasys.tax</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="type_tax_use"/>
+                        </group>
+                        <notebook>
+                            <page string="Definition">
+                                <group style="width:50%">
+                                    <field name="amount_type"/>
+                                    <field name="amount"/>
+                                </group>
+                                <group style="width:50%">
+                                    <field name="account_id"/>
+                                </group>
+                            </page>
+                            <page string="Advanced Options">
+                                <group style="width:50%">
+                                    <field name="description"/>
+                                    <field name="tax_group_id"/>
+                                    <field name="company_id"/>
+                                    <field name="active"/>
+                                </group>
+                                <group style="width:50%">
+                                    <field name="price_include"/>
+                                    <field name="include_base_amount"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_taxes" model="ir.actions.act_window">
+            <field name="name">Taxes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.tax</field>
+            <field name="domain">[('company_id.user_ids.id','=',uid)]</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="tax_tree_view"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+
+        <record id="payment_term_line_tree_view" model="ir.ui.view">
+            <field name="name">oasys.payment.term.line.list</field>
+            <field name="model">oasys.payment.term.line</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="sequence" widget="handle"/>
+                    <field name="payment_id" invisible="1"/>
+                    <field name="value"/>
+                    <field name="value_amount"/>
+                    <field name="days"/>
+                    <field name="option"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="payment_term_line_form_view" model="ir.ui.view">
+            <field name="name">oasys.payment.term.line.form</field>
+            <field name="model">oasys.payment.term.line</field>
+            <field name="arch" type="xml">
+                <form string="Payment Terms" editable="true" create="true" write="true" edit="true">
+                    <sheet>
+                        <group>
+                            <group string="Term Type">
+                                <field name="value"/>
+                                <label for="value_amount" attrs="{'invisible':[('value','=', 'balance')]}"/>
+                                <div attrs="{'invisible':[('value','=', 'balance')]}">
+                                    <field name="value_amount" class="oe_inline"/>
+                                    <label string="%" class="oe_inline" attrs="{'invisible':[('value','!=','percent')]}"/>
+                                </div>
+                                <field name="sequence" invisible="1"/>
+                            </group>
+
+                            <group string="Due Date Computation">
+                                <label string="Description"/>
+                                <div style="width:100%;">
+                                    <field  style="width:50%;" name="days" molabel="1"
+                                            attrs="{'invisible': [('option', 'in', ['last_day_following_month', 'last_day_current_month'])]}"/>
+                                    <label string=" " class="oe_inline"/>
+                                    <field  style="width:50%;" name="option" class="oe_inline" widget="radio" nolabel="1"/>
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="payment_term_tree_view" model="ir.ui.view">
+            <field name="name">oasys.payment.term.list</field>
+            <field name="model">oasys.payment.term</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="payment_term_form_view" model="ir.ui.view">
+            <field name="name">oasys.payment.term.form</field>
+            <field name="model">oasys.payment.term</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <field name="company_id" invisible="1"/>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                        <label for="note"/>
+                        <field name="note" placeholder="Payment term explanation for the customer..."/>
+                        <separator string="Terms"/>
+                        <p class="text-muted">
+                            The last line's computation type should be "Balance" to ensure that the whole amount will be allocated.
+                        </p>
+                        <field name="line_ids" widget="one2many_list" context="{'default_payment_id':id}"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="oasys.action_window_payment_terms" model="ir.actions.act_window">
+            <field name="name">Payment Terms</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.payment.term</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="payment_term_tree_view"/>
+            <field name="domain">[('company_id.user_ids.id','=',uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+        <record id="bank_account_tree_view" model="ir.ui.view">
+            <field name="name">oasys.journal.bank.list</field>
+            <field name="model">oasys.journal</field>
+            <field name="arch" type="xml">
+                <tree string="Account Journal">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="bank_account_form_view" model="ir.ui.view">
+            <field name="name">oasys.journal.bank.list</field>
+            <field name="model">oasys.journal</field>
+            <field name="arch" type="xml">
+                <form string="Bank Account">
+                    <sheet>
+                        <field name="type" invisible="1"/>
+                        <div class="oe_title">
+                            <label for="bank_acc_number" required="1" class="oe_edit_only"/>
+                            <h1><field name="bank_acc_number" required="1"/></h1>
+                        </div>
+                        <group col="4">
+                            <field name="bank_id"/>
+                            <field name="display_on_footer"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency"/>
+                            <field name="inbound_payment_method_ids" widget="many2many_checkboxes"/>
+                            <field name="outbound_payment_method_ids" widget="many2many_checkboxes"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_banks" model="ir.actions.act_window">
+            <field name="name">Bank Accounts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.journal</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="bank_account_tree_view"/>
+            <field name="domain">[('company_id.user_ids.id','=',uid),('type','=','bank')]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+        <record id="action_banks_tree_view" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="bank_account_tree_view"/>
+            <field name="act_window_id" ref="oasys.action_window_banks"/>
+        </record>
+
+        <record id="action_banks_form_view" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="bank_account_form_view"/>
+            <field name="act_window_id" ref="oasys.action_window_banks"/>
+        </record>
+
+        <record id="payment_method_tree_view" model="ir.ui.view">
+            <field name="name">oasys.payment.method.list</field>
+            <field name="model">oasys.payment.method</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Method">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="payment_type"/>
+                    <field name="is_default" string="Default"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="payment_method_form_view" model="ir.ui.view">
+            <field name="name">oasys.payment.method.form</field>
+            <field name="model">oasys.payment.method</field>
+            <field name="arch" type="xml">
+                <form string="Payment Method">
+                    <sheet>
+                        <group style="width:50%;">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="payment_type"/>
+                            <field name="is_default" string="Tick to set method to default."/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_payment_methods" model="ir.actions.act_window">
+            <field name="name">Payment Methods</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.payment.method</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="payment_method_tree_view"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

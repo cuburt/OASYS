@@ -1,0 +1,151 @@
+<odoo>
+    <data>
+
+
+        <!-- server action to the one above -->
+
+        <!--    <record model="ir.actions.server" id="OASYS.action_server">-->
+        <!--      <field name="name">OASYS server</field>-->
+        <!--      <field name="model_id" ref="model_oasys_oasys"/>-->
+        <!--      <field name="code">-->
+        <!--        action = {-->
+        <!--          "type": "ir.actions.act_window",-->
+        <!--          "view_mode": "tree,form",-->
+        <!--          "res_model": self._name,-->
+        <!--        }-->
+        <!--      </field>-->
+        <!--    </record>-->
+        <menuitem id="oasys.menu_root"
+                  name="Accounting"
+                  sequence="1"
+                  web_icon="oasys,static/description/icon.png"/>
+
+<!--        <menuitem id="menu_dashboard"-->
+<!--                  name="Dashboard"-->
+<!--                  parent="OASYS.menu_root"-->
+<!--                  action="OASYS.action_window_company_profile"-->
+<!--                  sequence="1"/>-->
+
+        <menuitem id="menu_revenue"
+                  name="Sales"
+                  parent="oasys.menu_root"
+                  sequence="2"/>
+
+        <menuitem id="menu_expenditure"
+                  name="Payments"
+                  parent="oasys.menu_root"
+                  sequence="3"/>
+
+        <menuitem id="menu_adviser"
+                  name="Adviser"
+                  parent="oasys.menu_root"
+                  sequence="4"/>
+
+        <menuitem id="menu_configuration"
+                  name="Configuration"
+                  parent="oasys.menu_root"
+                  sequence="5"/>
+
+<!--        <menuitem id="menu_report"-->
+<!--                  name="Reports"-->
+<!--                  parent="OASYS.menu_root"-->
+<!--                  action="OASYS.action_window_company_profile"-->
+<!--                  sequence="5"/>-->
+
+        <menuitem id="menu_sales_customer_invoices"
+                  name="Customer Invoices"
+                  parent="menu_revenue"
+                  action="oasys.action_window_sales_invoices"/>
+
+        <menuitem id="menu_sales_saleable_products"
+                  name="Saleable Products"
+                  parent="menu_revenue"
+                  action="oasys.action_window_products"/>
+
+        <menuitem id="menu_purchases_vendor_bills"
+                  name="Vendor Bills"
+                  parent="menu_expenditure"
+                  action="oasys.action_window_purchase_bills"/>
+
+        <menuitem id="menu_receipts"
+                  name="Receipts"
+                  parent="menu_expenditure"
+                  action="oasys.action_window_receipts"/>
+
+        <menuitem id="menu_adviser_journal_items"
+                  name="Journal Items"
+                  parent="menu_adviser"
+                  action="oasys.action_window_journal_items"/>
+
+        <menuitem id="menu_adviser_journal_entries"
+                  name="Journal Entries"
+                  parent="menu_adviser"
+                  action="oasys.action_window_journal_entries"/>
+
+<!--        <menuitem id="menu_adviser_statements_income"-->
+<!--                  name="Income Statements"-->
+<!--                  parent="menu_report"-->
+<!--                  action="OASYS.action_window_income_statements"/>-->
+
+        <menuitem id="menu_adviser_chart_of_accounts"
+                  name="Chart of Accounts"
+                  parent="menu_adviser"
+                  action="oasys.action_window_chart_of_accounts"/>
+
+        <menuitem id="menu_journals"
+                  name="Journals"
+                  parent="menu_configuration"
+                  action="oasys.action_window_journals"/>
+
+        <menuitem id="menu_accounts"
+                  name="Account Types"
+                  parent="menu_configuration"
+                  action="oasys.action_window_account_types"/>
+
+        <menuitem id="menu_tax"
+                  name="Taxes"
+                  parent="menu_configuration"
+                  action="oasys.action_window_taxes"/>
+
+        <menuitem id="menu_payment_term"
+                  name="Payment Terms"
+                  parent="menu_configuration"
+                  action="oasys.action_window_payment_terms"/>
+
+        <menuitem id="menu_bank"
+                  name="Bank Accounts"
+                  parent="menu_configuration"
+                  action="oasys.action_window_banks"/>
+
+        <menuitem id="menu_payment_method"
+                  name="Payment Methods"
+                  parent="menu_configuration"
+                  action="oasys.action_window_payment_methods"/>
+
+<!--        <menuitem id="menu_adviser_balance_sheets"-->
+<!--                  name="Balance Sheets"-->
+<!--                  parent="menu_report"-->
+<!--                  action="OASYS.action_window_balance_sheets"/>-->
+<!--        &lt;!&ndash; Top menu item &ndash;&gt;-->
+
+<!--        <menuitem name="OASYS" id="OASYS.menu_root"/>-->
+
+<!--        &lt;!&ndash; menu categories &ndash;&gt;-->
+
+<!--        <menuitem name="Journals" id="OASYS.menu_1" parent="OASYS.menu_root"/>-->
+<!--        <menuitem name="Statements" id="OASYS.menu_2" parent="OASYS.menu_root"/>-->
+
+<!--        &lt;!&ndash; actions &ndash;&gt;-->
+
+<!--        <menuitem name="Company Profile" id="OASYS.company_profile" parent="OASYS.menu_1"-->
+<!--                  action="OASYS.action_window_company_profile"/>-->
+
+
+
+        <!--    <menuitem name="Server to list" id="OASYS" parent="OASYS.menu_2"-->
+        <!--              action="OASYS.action_server"/>-->
+
+    </data>
+</odoo>
+
+

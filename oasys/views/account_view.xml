@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--        JOURNAL ENTRY-->
+        <record id="journal_entries_filter" model="ir.ui.view">
+            <field name="name">oasys.account.move.filter</field>
+            <field name="model">oasys.account.move</field>
+            <field name="arch" type="xml">
+                <search string="Search Move">
+                    <field name="name" string="Move" domain="['|',('name','ilike',self),('reference','ilike',self)]"/>
+                    <field name="date"/>
+                    <filter string="Unposted" domain="[('state','=','draft')]" help="Unposted Journal Entries"/>
+                    <filter name="posted_filter" string="Posted" domain="[('state','=','posted')]" help="Posted Journal Entries"/>
+                    <separator/>
+                    <filter string="Sales" domain="[('journal_id.type','=','sale')]" context="{'default_journal_type': 'sale'}"/>
+                    <filter string="Purchases" domain="[('journal_id.type','=','purchase')]" context="{'default_journal_type': 'purchase'}"/>
+                    <filter string="Bank Operations" domain="[('journal_id.type','=','bank')]" context="{'default_journal_type': 'bank'}"/>
+                    <filter string="Cash Operations" domain="[('journal_id.type','=','cash')]" context="{'default_journal_type': 'cash'}"/>
+                    <filter name="misc_filter" string="Miscellaneous Operations" domain="[('journal_id.type','=','general')]" context="{'default_journal_type': 'general'}"/>
+                    <separator/>
+                    <field name="partner_id"/>
+                    <field name="journal_id"/>
+                    <field name="dummy_account_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Journal" domain="[]" context="{'group_by':'journal_id'}"/>
+                        <filter string="States" domain="[]" context="{'group_by':'state'}"/>
+                        <filter string="Date" domain="[]" context="{'group_by':'date'}" help="Journal Entries by Month"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="journal_entries_tree_view" model="ir.ui.view">
+            <field name="name">oasys.account.move.list</field>
+            <field name="model">oasys.account.move</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="company_id"/>
+                    <field name="journal_id"/>
+                    <field name="amount" sum="Total Amount"/>
+                    <field name="state"/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="journal_entries_form_view" model="ir.ui.view">
+            <field name="name">oasys.account.move.form</field>
+            <field name="model">oasys.account.move</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <button name="post" string="Post" class="oe_highlight" states="draft" type="object" groups="oasys.group_oasys_user"/>
+
+                        <button name="button_cancel"  string="Cancel Entry" states="posted" type="object" groups="oasys.group_oasys_user"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="journal_id" options="{'no_open': True, 'no_create': True}" domain="[('company_id.user_ids.id','=', uid)]"/>
+                                <field name="date"/>
+                            </group>
+                            <group>
+                                <field name="reference"/>
+                                <field name="company_id"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Journal Items">
+                                <field name="line_ids" widget="one2many_list"
+                                       context="{'line_ids': line_ids, 'journal_id': journal_id }">
+                                    <tree editable="bottom" string="Journal Items">
+                                        <field name="account_id" domain="[('company_id', '=', parent.company_id), ('deprecated', '=', False)]"/>
+                                        <field name="partner_id"
+                                               domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]"/>
+                                        <field name="name"/>
+                                        <field name="debit" sum="Total Debit"/>
+                                        <field name="credit" sum="Total Credit"/>
+                                        <field name="date_maturity" required="0"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <field name="narration" colspan="4" placeholder="Add an internal note..." nolabel="1" height="50"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_journal_entries" model="ir.actions.act_window">
+            <field name="name">Journal Entries</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.account.move</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="journal_entries_filter"/>
+<!--            <field name="domain">[('company_id.user_ids.id','=',uid)]</field>-->
+            <field name="context">{'search_default_posted_filter':1,'search_default_misc_filter':1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a journal entry.
+                </p><p>
+                A journal entry consists of several journal items, each of
+                which is either a debit or a credit transaction.
+            </p><p>
+                Odoo automatically creates one journal entry per accounting
+                document: invoice, refund, vendor payment, bank statements,
+                etc. So, you should record journal entries manually only/mainly
+                for miscellaneous operations.
+            </p>
+            </field>
+        </record>
+
+        <!--        JOURNAL ITEMS-->
+        <record id="journal_items_filter" model="ir.ui.view">
+            <field name="name">oasys.account.move.line.filter</field>
+            <field name="model">oasys.account.move.line</field>
+            <field name="arch" type="xml">
+                <search string="">
+                    <filter name="posted_filter" string="Posted" domain="[('move_id.state','=','posted')]" help="Posted Journal Entries"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="journal_items_tree_view" model="ir.ui.view">
+            <field name="name">oasys.account.move.line.tree</field>
+            <field name="model">oasys.account.move.line</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="date"/>
+                    <field name="move_id"/>
+                    <field name="journal_id"/>
+                    <field name="name"/>
+                    <field name="reference"/>
+                    <field name="partner_id"/>
+                    <field name="account_id"/>
+                    <field name="debit" sum="Total Debit"/>
+                    <field name="credit" sum="Total Credit"/>
+                    <field name="date_maturity"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="journal_items_form_view" model="ir.ui.view">
+            <field name="name">oasys.account.move.line.form</field>
+            <field name="model">oasys.account.move.line</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group style="width:50%;">
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group style="width:50%;">
+                            <field name="journal_id"/>
+                            <field name="date"/>
+                            <field name="company_id"/>
+                        </group>
+                        <notebook>
+                            <page string="Information">
+                                <group string="Amount" style="width:50%;">
+                                    <field name="account_id"/>
+                                    <field name="debit"/>
+                                    <field name="credit"/>
+                                    <field name="quantity"/>
+                                </group>
+                                <group string="Accounting Documents" style="width:50%;">
+                                    <field name="move_id"/>
+                                </group>
+                                 <group string="Date" style="width:50%;">
+                                    <field name="date_maturity"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_journal_items" model="ir.actions.act_window">
+            <field name="name">Journal Items</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.account.move.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="journal_items_filter"/>
+<!--            <field name="domain">[('company_id.user_ids.id','=',uid)]</field>-->
+            <field name="context">{'search_default_posted_filter':1}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a journal item.
+                </p><p>
+                A journal item is the initial entry in accounting and it consists of either a debit or a credit transaction.
+            </p><p>
+                OASYS automatically creates one journal item based on transaction.
+            </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

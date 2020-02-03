@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="receipt_tree_view" model="ir.ui.view">
+            <field name="name">oasys.receipt.list</field>
+            <field name="model">oasys.receipt</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <field name="date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="receipt_form_view" model="ir.ui.view">
+            <field name="name">oasys.receipt.form</field>
+            <field name="model">oasys.receipt</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+       <record id="oasys.action_window_receipts" model="ir.actions.act_window">
+           <field name="name">Receipts Received</field>
+           <field name="type">ir.actions.act_window</field>
+           <field name="res_model">oasys.receipt</field>
+           <field name="view_mode">tree,form</field>
+           <field name="help" type="html">
+             <p class="oe_view_nocontent_create">
+               <!-- Add Text Here -->
+             </p><p>
+               <!-- More details about what a user can do with this object will be OK -->
+             </p>
+           </field>
+       </record>
+
+
+    </data>
+</odoo>

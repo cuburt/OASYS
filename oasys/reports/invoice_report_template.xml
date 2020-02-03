@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+       <!-- QWeb Reports -->
+       <!-- NAME & FILE_NAME should be the same -->
+               <report
+                   id="report_invoice_view"
+                   model="oasys.account.invoice"
+                   report_type="qweb-pdf"
+                   string="Invoice"
+                   name = "oasys.invoice_report"
+                   paperformat="oasys.custom_legal_half_paperformat"
+                   file = "oasys.invoice_report"
+                   menu="False"
+               />
+                <template id="invoice_report">
+                    <t t-call="report.html_container">
+                        <t t-call="report.internal_layout">
+                        <!-- <t t-call="report.external_layout"> -->
+                            <div class="page">
+                                <h2>Invoice</h2>
+                                <!--
+                                Build your report here!
+                                Do it in awesome way ;)
+                                -->
+                            </div>
+                        </t>
+                    </t>
+                </template>
+
+
+
+    </data>
+</odoo>

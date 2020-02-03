@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!--        SALES-->
+        <record id="invoices_filter" model="ir.ui.view">
+            <field name="name">oasys.account.invoice.filter</field>
+            <field name="model">oasys.account.invoice</field>
+            <field name="arch" type="xml">
+                <search string="Search Invoice">
+                    <field name="number" string="Invoice" filter_domain="['|','|','|', ('number','ilike',self), ('origin','ilike',self), ('reference', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                    <field name="journal_id" />
+                    <filter string="Draft" domain="[('state','=','draft')]" context="{'default_account_type': 'receivable'}"/>
+                    <!--                    <filter string="Pro-forma" domain="['|',('state','=','proforma'),('state','=','proforma2')]" context="{'default_account_type': 'receivable'}"/>-->
+                    <filter string="Open" domain="[('state','=','open')]" context="{'default_account_type': 'receivable'}"/>
+                    <filter string="Cancelled" domain="[('state','=','cancel')]" context="{'default_account_type': 'receivable'}"/>
+                    <separator/>
+                    <filter name="state_filter" string="Not Paid" domain="[('state','=','open')]" context="{'default_account_type': 'receivable'}"/>
+                    <filter name="late" string="Overdue" domain="['&amp;', ('date_due', '&lt;', time.strftime('%%Y-%%m-%%d')), ('state', '=', 'open')]" help="Overdue invoices, maturity date passed"/>
+                    <filter name="paid_filter" string="Paid" domain="[('state','=','paid')]"/>
+                    <separator/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="user_id" string="Salesperson"/>
+                    <field name="date_invoice" string="Period"/>
+                    <separator/>
+                    <filter domain="[('user_id','=',uid)]" help="My Invoices"/>
+                    <!--                    <filter domain="[('company_id','=',uid)]" help="Company Invoices"/>-->
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_partner_id" string="Partner" context="{'group_by':'commercial_partner_id'}"/>
+                        <filter string="Salesperson" context="{'group_by':'user_id'}"/>
+                        <filter name="status" string="Status" context="{'group_by':'state'}"/>
+                        <separator/>
+                        <filter string="Invoice Date" context="{'group_by':'date_invoice'}"/>
+                        <filter string="Due Date" context="{'group_by':'date_due'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="sale_invoice_tree_view" model="ir.ui.view">
+            <field name="name">oasys.account.invoice.list</field>
+            <field name="model">oasys.account.invoice</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" string="Invoice">
+                    <field name="partner_id" groups="base.group_user" string="Customer" />
+                    <field name="partner_company" string="Customer's Company"/>
+                    <field name="date_invoice"/>
+                    <field name="number"/>
+                    <field name="commercial_partner_id" invisible="1"/>
+                    <field name="reference" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                    <field name="journal_id" invisible="1"/>
+                    <field name="company_id" options="{'no_create': True}" string="Company"/>
+                    <field name="user_id"/>
+                    <field name="date_due"/>
+                    <field name="origin"/>
+                    <!--                    <field name="amount_total_signed" string="Total" sum="Total"/>-->
+                    <!--                    <field name="residual_signed" string="Amount Due" sum="Amount Due"/>-->
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="state"/>
+                    <field name="type" invisible="context.get('type',True)"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="purchase_invoice_tree_view" model="ir.ui.view">
+            <field name="name">oasys.account.invoice.list</field>
+            <field name="model">oasys.account.invoice</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'" decoration-muted="state == 'cancel'" string="Invoice">
+                    <field name="user_id" options="{'no_create': True}" string="Customer"/>
+                    <field name="company_id" string="Customer's Company"/>
+                    <field name="date_invoice" string="Bill Date"/>
+                    <field name="number"/>
+                    <field name="commercial_partner_id" invisible="1"/>
+                    <field name="reference" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                    <field name="journal_id" invisible="1"/>
+                    <field name="partner_id" groups="base.group_user" string="Salesperson"/>
+                    <field name="partner_company"/>
+                    <field name="date_due"/>
+                    <field name="origin"/>
+                    <!--                    <field name="amount_total_signed" string="Total" sum="Total"/>-->
+                    <!--                    <field name="residual_signed" string="Amount Due" sum="Amount Due"/>-->
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="state"/>
+                    <field name="type" invisible="context.get('type',True)"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="receipt_tree_view" model="ir.ui.view">
+            <field name="name">oasys.receipt.list</field>
+            <field name="model">oasys.receipt</field>
+            <field name="arch" type="xml">
+                <tree string="Receipts">
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="residual"/>
+                    <field name="amount"/>
+                    <field name="invoice_no"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="receipt_form_view" model="ir.ui.view">
+            <field name="name">oasys.receipt.form</field>
+            <field name="model">oasys.receipt</field>
+            <field name="arch" type="xml">
+                <form string="Receipts">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name"/></h1>
+                            <group><field name="date" string="Issued On:"/></group>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="user_id" string="Issued By:"/>
+                                <field name="company_id"/>
+                            </group>
+                            <group>
+                                <field name="customer" string="Issued To:"/>
+                                <field name="partner_company_id"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <group>
+                                    <field name="type" widget="radio"/>
+                                    <field name="invoice_no"/>
+                                    <field name="amount"/>
+                                    <field name="residual"/>
+                                </group>
+                            </page>
+                            <page string="Invoice Lines">
+                                <field name="invoice_line_ids">
+                                    <tree string="Invoice Lines" editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="quantity"/>
+                                        <field name="price_unit"/>
+                                        <field name="discount" groups="base.group_no_one"/>
+                                        <field name="invoice_line_tax_ids"/>
+                                        <field name="price_subtotal" sum="Amount Due"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_invoice_payment" model="ir.actions.act_window">
+            <field name="name">Register Payment: Inbound</field>
+            <field name="res_model">oasys.receipt</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="receipt_form_view"/>
+            <!--            <field name="context"></field>-->
+            <field name="target">new</field>
+        </record>
+
+        <record id="sale_invoice_form_view" model="ir.ui.view">
+            <field name="name">oasys.account.invoice.form</field>
+            <field name="model">oasys.account.invoice</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <button name="invoice_print" string="Print" type="object" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="oasys.group_oasys_user"/>
+                        <button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="oasys.group_oasys_user"/>
+                        <button name="%(action_invoice_payment)d" type="action" string="Register Payment" class="oe_highlight" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" context="{'invoice_id': id,'invoice_no': number,'invoice_line_ids':invoice_line_ids, 'residual':residual}"  groups="oasys.group_oasys_user"/>
+
+
+                        <button name="action_invoice_open" type="object" states="draft" string="Validate" class="oe_highlight" groups="oasys.group_oasys_user"/>
+                        <button name="action_invoice_cancel" type="object" states="draft,proforma2,open" string="Cancel Invoice" groups="oasys.group_oasys_accountant"/>
+                        <button name="action_invoice_draft" states="cancel" string="Reset to Draft" type="object" groups="oasys.group_oasys_accountant"/>
+
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,open,paid"/>
+                    </header>
+                    <sheet string ="Invoice">
+
+                        <h1 class="mt0">
+                            <label string="Draft Invoice" attrs="{'invisible': ['|',('state','not in',('draft',)), ('type','&lt;&gt;','out_invoice')]}"/>
+                            <field name="number" readonly="1" class="oe_inline" attrs="{'invisible': [('state','in',('draft',))]}"/>
+                        </h1>
+                        <field name="type" invisible="1"/>
+                        <group>
+                            <group>
+                                <field string="Customer" name="partner_id"
+                                       context="{'search_default_customer':1, 'show_address': 1}"
+                                       options='{"always_reload": True}'
+                                       domain="[('customer', '=', True)]"/>
+                                <field name="payment_term_id"/>
+                            </group>
+                            <group>
+                                <field name="date_invoice"/>
+                                <field name="move_name" invisible="1"/>
+                                <field name="user_id" groups="base.group_user"/>
+                                <label for="currency_id" groups="base.group_multi_currency"/>
+                                <div groups="base.group_multi_currency">
+                                    <field name="currency_id" options="{'no_create': True, 'no_open': True}" class="oe_inline"/>
+                                    <field name="company_currency_id" invisible="1"/>
+                                </div>
+                            </group>
+                        </group>
+                        <field name="sent" invisible="1"/>
+                        <notebook colspan="4">
+                            <page string="Invoice Lines">
+                                <field name="invoice_line_ids" nolabel="1" widget="one2many_list" context="{'type':type, 'journal_id':journal_id, 'default_invoice_id':id}">
+                                    <tree string="Invoice Lines" editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="origin" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="company_id" invisible="1"/>
+                                        <field name="account_id" groups="oasys.group_oasys_accountant"
+                                               domain="[('company_id', '=', parent.company_id), ('internal_type', '=', 'other')]"/>
+                                        <!--                                        <field name="account_analytic_id" groups="analytic.group_analytic_accounting"-->
+                                        <!--                                               domain="[('company_id', '=', parent.company_id)]"/>-->
+                                        <!--                                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags"/>-->
+                                        <field name="quantity"/>
+                                        <!--                                        <field name="uom_id" groups="product.group_uom"/>-->
+                                        <field name="price_unit"/>
+                                        <field name="discount" groups="base.group_no_one"/>
+                                        <field name="invoice_line_tax_ids" widget="many2many_tags" context="{'type':parent.type}"
+                                               domain="[('type_tax_use','=','sale'),('company_id', '=', parent.company_id)]" options="{'no_create': True}"/>
+                                        <field name="price_subtotal"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="amount_untaxed"/>
+                                    <field name="amount_tax"/>
+                                    <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                    <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                                    <field name="residual" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                                    <!--                            <field name="reconciled" invisible="1"/>-->
+                                    <!--                            <field name="outstanding_credits_debits_widget" colspan="2" nolabel="1" widget="payment" attrs="{'invisible': [('state', 'not in', 'open')]}"/>-->
+                                </group>
+                                <field name="comment" placeholder="Terms and conditions..."/>
+                            </page>
+                            <page string="Other Info" name="other_info">
+                                <group>
+                                    <group>
+                                        <!--                                    <field name="fiscal_position_id" options="{'no_create': True}" />-->
+                                        <field name="journal_id" groups="oasys.group_oasys_user"
+                                               options="{'no_create': True}" attrs="{'readonly':True}"/>
+                                        <field domain="[('company_id', '=', company_id),('internal_type','=', 'receivable'), ('deprecated', '=', False)]"
+                                               name="account_id" groups="oasys.group_oasys_user"/>
+                                        <field name="company_id" options="{'no_create': True}" />
+                                        <field domain="[('partner_id.ref_company_ids', 'in', [company_id])]" name="partner_bank_id" invisible="1"/>
+                                        <field name="date_due" groups="base.group_no_one"/>
+                                    </group>
+                                    <group>
+                                        <field name="move_id" groups="oasys.group_oasys_adviser" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                                        <field name="origin" groups="base.group_user" attrs="{'invisible': [('origin', '=', False)]}"/>
+                                        <field name="name"/>
+                                    </group>
+                                </group>
+<!--                                <field name="tax_line_ids">-->
+<!--                                    <tree editable="bottom" string="Taxes" create="0">-->
+<!--                                        <field name="name"/>-->
+<!--                                        &lt;!&ndash;Need invisible fields for on_change to create all necessary info &ndash;&gt;-->
+<!--                                        <field name="tax_id" invisible="1"/>-->
+<!--                                        &lt;!&ndash;                                                                    <field name="account_analytic_id" invisible="1"/>&ndash;&gt;-->
+<!--                                        <field name="manual" invisible="1"/>-->
+<!--                                        <field name="account_id" groups="OASYS.group_oasys_user"/>-->
+<!--                                        <field name="amount"/>-->
+<!--                                        <field name="currency_id" invisible="1"/>-->
+<!--                                    </tree>-->
+<!--                                </field>-->
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="purchase_invoice_form_view" model="ir.ui.view">
+            <field name="name">oasys.account.invoice.form</field>
+            <field name="model">oasys.account.invoice</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <button name="invoice_print" string="Print" type="object" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="oasys.group_oasys_user"/>
+                        <button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="oasys.group_oasys_user"/>
+
+
+                        <!--                        <button name="action_invoice_open" type="object" states="draft" string="Validate" class="oe_highlight" groups="OASYS.group_oasys_user"/>-->
+                        <!--                        <button name="action_invoice_cancel" type="object" states="draft,proforma2,open" string="Cancel Invoice" groups="OASYS.group_oasys_accountant"/>-->
+                        <!--                        <button name="action_invoice_draft" states="cancel" string="Reset to Draft" type="object" groups="OASYS.group_oasys_accountant"/>-->
+
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="open,paid"/>
+                    </header>
+                    <sheet string ="Invoice">
+
+                        <h1 class="mt0">
+                            <label string="Draft Invoice" attrs="{'invisible': ['|',('state','not in',('draft',)), ('type','&lt;&gt;','out_invoice')]}"/>
+                            <field name="number" readonly="1" class="oe_inline" attrs="{'invisible': [('state','in',('draft',))]}"/>
+                        </h1>
+                        <field name="type" invisible="1"/>
+                        <group>
+                            <group>
+                                <field string="Customer" name="user_id"
+                                       context="{'search_default_customer':1, 'show_address': 1}"
+                                       options='{"always_reload": True}'
+                                       domain="[('customer', '=', True)]"/>
+                            </group>
+                            <group>
+                                <field name="date_invoice"/>
+                                <field name="move_name" invisible="1"/>
+                                <field name="partner_id" groups="base.group_user"
+                                       context="{'search_default_customer':1, 'show_address': 1}"/>
+                                <label for="currency_id" groups="base.group_multi_currency"/>
+                                <div groups="base.group_multi_currency">
+                                    <field name="currency_id" options="{'no_create': True, 'no_open': True}" class="oe_inline"/>
+                                    <field name="company_currency_id" invisible="1"/>
+                                </div>
+                            </group>
+                        </group>
+                        <field name="sent" invisible="1"/>
+                        <notebook colspan="4">
+                            <page string="Invoice Lines">
+                                <field name="invoice_line_ids" nolabel="1" widget="one2many_list" context="{'type':type, 'journal_id':journal_id, 'default_invoice_id':id}">
+                                    <tree string="Invoice Lines" editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="origin" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="company_id" invisible="1"/>
+                                        <field name="account_id" groups="oasys.group_oasys_accountant"
+                                               domain="[('company_id', '=', parent.company_id), ('internal_type', '=', 'other')]"/>
+                                        <!--                                        <field name="account_analytic_id" groups="analytic.group_analytic_accounting"-->
+                                        <!--                                               domain="[('company_id', '=', parent.company_id)]"/>-->
+                                        <!--                                        <field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags"/>-->
+                                        <field name="quantity"/>
+                                        <!--                                        <field name="uom_id" groups="product.group_uom"/>-->
+                                        <field name="price_unit"/>
+                                        <field name="discount" groups="base.group_no_one"/>
+                                        <!--                                        <field name="invoice_line_tax_ids" widget="many2many_tags" context="{'type':parent.type}"-->
+                                        <!--                                               domain="[('type_tax_use','=','sale'),('company_id', '=', parent.company_id)]" options="{'no_create': True}"/>-->
+                                        <field name="price_subtotal"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="amount_untaxed"/>
+                                    <field name="amount_tax"/>
+                                    <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                    <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                                    <field name="residual" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+<!--                                    <field name="reconciled" invisible="1"/>-->
+<!--                                    <field name="outstanding_credits_debits_widget" colspan="2" nolabel="1" widget="payment" attrs="{'invisible': [('state', 'not in', 'open')]}"/>-->
+                                </group>
+                                <field name="comment" placeholder="Terms and conditions..."/>
+                            </page>
+                            <page string="Other Info" name="other_info">
+                                <group>
+                                    <group>
+                                        <!--                                    <field name="fiscal_position_id" options="{'no_create': True}" />-->
+                                        <field name="journal_id" groups="oasys.group_oasys_user"
+                                               options="{'no_create': True}" attrs="{'readonly': True}"/>
+                                        <field domain="[('company_id', '=', company_id),('internal_type','=', 'receivable'), ('deprecated', '=', False)]"
+                                               name="account_id" groups="oasys.group_oasys_user"/>
+                                        <field name="company_id" options="{'no_create': True}" />
+                                        <!--                                    <field domain="[('partner_id.ref_company_ids', 'in', [company_id])]" name="partner_bank_id" invisible="1"/>-->
+                                        <field name="date_due" groups="base.group_no_one"/>
+                                    </group>
+                                    <group>
+                                        <field name="move_id" groups="oasys.group_oasys_adviser" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                                        <field name="origin" groups="base.group_user" attrs="{'invisible': [('origin', '=', False)]}"/>
+                                        <field name="name"/>
+                                    </group>
+                                </group>
+                                <!--                            <field name="tax_line_ids">-->
+                                <!--                                <tree editable="bottom" string="Taxes" create="0">-->
+                                <!--                                    <field name="name"/>-->
+                                <!--                                    &lt;!&ndash;Need invisible fields for on_change to create all necessary info &ndash;&gt;-->
+                                <!--                                    <field name="tax_id" invisible="1"/>-->
+                                <!--                                    <field name="account_analytic_id" invisible="1"/>-->
+                                <!--                                    <field name="sequence" invisible="1"/>-->
+                                <!--                                    <field name="manual" invisible="1"/>-->
+                                <!--                                    <field name="account_id" groups="account.group_account_user"/>-->
+                                <!--                                    <field name="amount"/>-->
+                                <!--                                    <field name="currency_id" invisible="1"/>-->
+                                <!--                                </tree>-->
+                                <!--                            </field>-->
+                            </page>
+                            <page string="Received Receipts">
+                                <field name="receipt_ids" nolabel="1">
+                                    <tree>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="oasys.action_window_sales_invoices" model="ir.actions.act_window">
+            <field name="name">Customer Invoices</field>
+            <field name="res_model">oasys.account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="invoices_filter"/>
+            <field name="domain">[('type','in',('out_invoice','out_refund')),('company_id.user_ids.id','=',uid)]</field>
+            <field name="context">{'search_default_state_filter':1,'type':'out_invoice', 'journal_type': 'sale'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a customer invoice.
+                </p><p>
+                OASYS's electronic invoicing allows to ease and fasten the collection of customer payments. Your customer receives the invoice by email and he can pay online and/or import it in his own system.
+                The discussions with your customer are automatically displayed at the bottom of each invoice.
+            </p>
+            </field>
+        </record>
+
+        <record id="action_sale_invoice_tree_view" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="sale_invoice_tree_view"/>
+            <field name="act_window_id" ref="oasys.action_window_sales_invoices"/>
+        </record>
+
+        <record id="action_sale_invoice_form_view" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sale_invoice_form_view"/>
+            <field name="act_window_id" ref="oasys.action_window_sales_invoices"/>
+        </record>
+
+        <!--        BILLS-->
+
+        <record id="oasys.action_window_purchase_bills" model="ir.actions.act_window">
+            <field name="name">Vendor Bills</field>
+            <field name="res_model">oasys.account.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="invoices_filter"/>
+            <field name="domain">[('type','in',('in_invoice','in_refund')),('company_id.user_ids.id','=',uid)]</field>
+            <field name="context">{'type':'in_invoice', 'journal_type': 'purchase'}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to record a new vendor bill.
+                </p><p>
+                You can control the invoice from your vendor according to
+                what you purchased or received.
+            </p>
+            </field>
+        </record>
+
+        <record id="action_purchase_invoice_tree_view" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="purchase_invoice_tree_view"/>
+            <field name="act_window_id" ref="oasys.action_window_purchase_bills"/>
+        </record>
+
+        <record id="action_purchase_invoice_form_view" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="purchase_invoice_form_view"/>
+            <field name="act_window_id" ref="oasys.action_window_purchase_bills"/>
+        </record>
+
+    </data>
+</odoo>
+
+
+

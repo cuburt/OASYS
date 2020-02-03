@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_category_form_view" model="ir.ui.view">
+            <field name="name">oasys.product.category.form</field>
+            <field name="model">oasys.product.category</field>
+            <field name="arch" type="xml">
+                <form string="Product Category">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="parent_id"/>
+                                <field name="type"/>
+                                <field name="company_id"/>
+                            </group>
+                            <group>
+                                <field name="property_account_income_id" domain="[('company_id','=',company_id),('user_type_id','=','Income')]"/>
+                                <field name="property_account_expense_id" domain="[('company_id','=',company_id),('user_type_id','=','Expenses')]"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sale_products_tree_view" model="ir.ui.view">
+            <field name="name">oasys.sale.products.list</field>
+            <field name="model">oasys.product</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="default_code"/>
+                    <field name="name"/>
+                    <field name="list_price"/>
+                    <field name="standard_price"/>
+                    <field name="category_id"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sale_products_form_view" model="ir.ui.view">
+            <field name="name">oasys.sale.products.form</field>
+            <field name="model">oasys.product</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <field name="image_medium" widget="image" class="oe_left oe_avatar" />
+                        <div class="oe_title">
+                            <label for="name" required="1" class="oe_edit_only"/>
+                            <h1><field name="name" required="1"/></h1>
+                            <field  style="width:3%;" name="is_sellable" molabel="1"/>
+                            <label string="Can be Sold" class="oe_inline"/>
+                            <br/>
+                            <field  style="width:3%;" name="is_available" molabel="1"/>
+                            <label string="Can be Purchased" class="oe_inline"/>
+                            <br/>
+                            <field  style="width:3%;" name="is_active" molabel="1"/>
+                            <label string="Active" class="oe_inline"/>
+                        </div>
+                        <notebook>
+                            <page string="General Information">
+                                <group>
+                                    <group>
+                                        <field name="type"/>
+                                        <field name="default_code"/>
+                                        <field name="barcode"/>
+                                        <field name="category_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="list_price"/>
+                                        <field name="standard_price"/>
+                                        <field name="company_id"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <!--                            <page string="Sales">-->
+                            <!--                                <group>-->
+                            <!--                                    <field name=""/>-->
+                            <!--                                </group>-->
+                            <!--                            </page>-->
+                            <page string="Invoicing">
+                                <group>
+                                    <group>
+                                        <field name="property_account_income_id" domain="[('company_id','=',company_id),('user_type_id','=','Income')]"/>
+                                        <field name="tax_ids" widget="many2many_tags"/>
+                                    </group>
+                                    <group>
+                                        <field name="property_account_expense_id" domain="[('company_id','=',company_id),('user_type_id','=','Expenses')]"/>
+                                        <field name="supplier_tax_ids" widget="many2many_tags"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Notes">
+                                <group string="Description for Quotations">
+                                    <field name="description" nolabel="1" placeholder="This note will be displayed on the quotations."/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="oasys.action_window_products" model="ir.actions.act_window">
+            <field name="name">Sellable Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oasys.product</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+            </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
