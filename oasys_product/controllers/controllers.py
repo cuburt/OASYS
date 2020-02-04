@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 
-# class OasysProduct(http.Controller):
+# class oasysProduct(http.Controller):
 #     @http.route('/oasys_product/oasys_product/', auth='public')
 #     def index(self, **kw):
 #         return "Hello, world"

@@ -2,7 +2,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError
 
 class PaymentMethod(models.Model):
-    _name = "OASYS.payment.method"
+    _name = "oasys.payment.method"
     _description = "Payment Methods"
 
 
@@ -25,7 +25,7 @@ class PaymentMethod(models.Model):
     def write(self, vals):
         record = super(PaymentMethod, self).write(vals)
         for rec in self:
-            if vals['is_default'] and self.env['OASYS.payment.method'].search([('payment_type', '=', rec.payment_type), ('is_default', '=', True)],limit=1,offset=1,order='id asc'):
+            if vals['is_default'] and self.env['oasys.payment.method'].search([('payment_type', '=', rec.payment_type), ('is_default', '=', True)],limit=1,offset=1,order='id asc'):
                 raise UserError(_('Another method has already been set to default.'))
 
         return record

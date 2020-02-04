@@ -4,8 +4,8 @@
 
         <!-- server action to the one above -->
 
-        <!--    <record model="ir.actions.server" id="OASYS.action_server">-->
-        <!--      <field name="name">OASYS server</field>-->
+        <!--    <record model="ir.actions.server" id="oasys.action_server">-->
+        <!--      <field name="name">oasys server</field>-->
         <!--      <field name="model_id" ref="model_oasys_oasys"/>-->
         <!--      <field name="code">-->
         <!--        action = {-->
@@ -22,8 +22,8 @@
 
 <!--        <menuitem id="menu_dashboard"-->
 <!--                  name="Dashboard"-->
-<!--                  parent="OASYS.menu_root"-->
-<!--                  action="OASYS.action_window_company_profile"-->
+<!--                  parent="oasys.menu_root"-->
+<!--                  action="oasys.action_window_company_profile"-->
 <!--                  sequence="1"/>-->
 
         <menuitem id="menu_revenue"
@@ -48,8 +48,8 @@
 
 <!--        <menuitem id="menu_report"-->
 <!--                  name="Reports"-->
-<!--                  parent="OASYS.menu_root"-->
-<!--                  action="OASYS.action_window_company_profile"-->
+<!--                  parent="oasys.menu_root"-->
+<!--                  action="oasys.action_window_company_profile"-->
 <!--                  sequence="5"/>-->
 
         <menuitem id="menu_sales_customer_invoices"
@@ -85,7 +85,7 @@
 <!--        <menuitem id="menu_adviser_statements_income"-->
 <!--                  name="Income Statements"-->
 <!--                  parent="menu_report"-->
-<!--                  action="OASYS.action_window_income_statements"/>-->
+<!--                  action="oasys.action_window_income_statements"/>-->
 
         <menuitem id="menu_adviser_chart_of_accounts"
                   name="Chart of Accounts"
@@ -125,25 +125,25 @@
 <!--        <menuitem id="menu_adviser_balance_sheets"-->
 <!--                  name="Balance Sheets"-->
 <!--                  parent="menu_report"-->
-<!--                  action="OASYS.action_window_balance_sheets"/>-->
+<!--                  action="oasys.action_window_balance_sheets"/>-->
 <!--        &lt;!&ndash; Top menu item &ndash;&gt;-->
 
-<!--        <menuitem name="OASYS" id="OASYS.menu_root"/>-->
+<!--        <menuitem name="oasys" id="oasys.menu_root"/>-->
 
 <!--        &lt;!&ndash; menu categories &ndash;&gt;-->
 
-<!--        <menuitem name="Journals" id="OASYS.menu_1" parent="OASYS.menu_root"/>-->
-<!--        <menuitem name="Statements" id="OASYS.menu_2" parent="OASYS.menu_root"/>-->
+<!--        <menuitem name="Journals" id="oasys.menu_1" parent="oasys.menu_root"/>-->
+<!--        <menuitem name="Statements" id="oasys.menu_2" parent="oasys.menu_root"/>-->
 
 <!--        &lt;!&ndash; actions &ndash;&gt;-->
 
-<!--        <menuitem name="Company Profile" id="OASYS.company_profile" parent="OASYS.menu_1"-->
-<!--                  action="OASYS.action_window_company_profile"/>-->
+<!--        <menuitem name="Company Profile" id="oasys.company_profile" parent="oasys.menu_1"-->
+<!--                  action="oasys.action_window_company_profile"/>-->
 
 
 
-        <!--    <menuitem name="Server to list" id="OASYS" parent="OASYS.menu_2"-->
-        <!--              action="OASYS.action_server"/>-->
+        <!--    <menuitem name="Server to list" id="oasys" parent="oasys.menu_2"-->
+        <!--              action="oasys.action_server"/>-->
 
     </data>
 </odoo>

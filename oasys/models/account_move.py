@@ -10,7 +10,7 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMA
 
 
 class AccountMove(models.Model):
-    _name = 'OASYS.account.move'
+    _name = 'oasys.account.move'
     _description = 'Account Entry'
     _order = 'date desc, id desc'
 
@@ -43,7 +43,7 @@ class AccountMove(models.Model):
     @api.multi
     def _get_default_journal(self):
         if self.env.context.get('default_journal_type'):
-            return self.env['OASYS.journal'].search(['&',('type', '=', self.env.context['default_journal_type']),('code','=','MISC'),('company_id','=',self.env.user.company_id.id)],
+            return self.env['oasys.journal'].search(['&',('type', '=', self.env.context['default_journal_type']),('code','=','MISC'),('company_id','=',self.env.user.company_id.id)],
                                                       limit=1).id
 
     @api.multi
@@ -56,7 +56,7 @@ class AccountMove(models.Model):
     name = fields.Char(string='Number', required=True, copy=False,default='/')
     reference = fields.Char(string='Reference', copy=False)
     date = fields.Date(required=True, states={'posted': [('readonly', True)]}, index=True, default=fields.Date.context_today)
-    journal_id = fields.Many2one('OASYS.journal', string='Journal', required=True, states={'posted': [('readonly', True)]}, default=_get_default_journal)
+    journal_id = fields.Many2one('oasys.journal', string='Journal', required=True, states={'posted': [('readonly', True)]}, default=_get_default_journal)
     currency_id = fields.Many2one('res.currency', compute='_compute_currency', store=True, string="Currency")
     state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
                              required=True, readonly=True, copy=False, default='draft',
@@ -65,7 +65,7 @@ class AccountMove(models.Model):
                                   'In that case, they will behave as journal entries automatically created by the '
                                   'system on document validation (invoices, bank statements...) and will be created '
                                   'in \'Posted\' status.')
-    line_ids = fields.One2many('OASYS.account.move.line', 'move_id', string='Journal Items',
+    line_ids = fields.One2many('oasys.account.move.line', 'move_id', string='Journal Items',
                                states={'posted': [('readonly', True)]}, copy=True)
     partner_id = fields.Many2one('res.partner', compute='_compute_partner_id', string="Partner", store=True, readonly=True)
     company_id = fields.Many2one('res.company', related='journal_id.company_id', string='Company', store=True,
@@ -77,7 +77,7 @@ class AccountMove(models.Model):
     #connected bank
     #statement_line_id = fields.Many2one('account.bank.statement.line', index=True, string='Bank statement line reconciled with this entry', copy=False, readonly=True)
     #for search purposes
-    dummy_account_id = fields.Many2one('OASYS.account', related='line_ids.account_id', string='Account', store=False, readonly=True)
+    dummy_account_id = fields.Many2one('oasys.account', related='line_ids.account_id', string='Account', store=False, readonly=True)
 
     @api.multi
     def post(self):
@@ -130,10 +130,10 @@ class AccountMove(models.Model):
     def _check_lock_date(self):
         for move in self:
             lock_date = max(move.company_id.period_lock_date, move.company_id.fiscalyear_lock_date)
-            if self.user_has_groups('OASYS.group_oasys_adviser'):
+            if self.user_has_groups('oasys.group_oasys_adviser'):
                 lock_date = move.company_id.fiscalyear_lock_date
             if move.date <= lock_date:
-                if self.user_has_groups('OASYS.group_oasys_adviser'):
+                if self.user_has_groups('oasys.group_oasys_adviser'):
                     message = _("You cannot add/modify entries prior to and inclusive of the lock date %s") % (lock_date)
                 else:
                     message = _("You cannot add/modify entries prior to and inclusive of the lock date %s. Check the company settings or ask someone with the 'Adviser' role") % (lock_date)
@@ -167,7 +167,7 @@ class AccountMove(models.Model):
         return True
 
 class AccountMoveLine(models.Model):
-    _name = "OASYS.account.move.line"
+    _name = "oasys.account.move.line"
     _description = "Journal Item"
     _order = "date desc, id desc"
 
@@ -199,7 +199,7 @@ class AccountMoveLine(models.Model):
     quantity = fields.Float(digits=dp.get_precision('Product Unit of Measure'),
                             help="The optional quantity expressed by this line, eg: number of product sold. The quantity is not a legal requirement but is very useful for some reports.")
     # product_uom_id = fields.Many2one('product.uom', string='Unit of Measure')
-    product_id = fields.Many2one('OASYS.product', string='Product')
+    product_id = fields.Many2one('oasys.product', string='Product')
     debit = fields.Monetary(default=0.0, currency_field='currency_id')
     credit = fields.Monetary(default=0.0, currency_field='currency_id')
     balance = fields.Monetary(compute='_store_balance', store=True, currency_field='currency_id',
@@ -207,27 +207,27 @@ class AccountMoveLine(models.Model):
 
     currency_id = fields.Many2one('res.currency', string='Currency', default=_get_currency,
                                  help="The optional other currency if it is a multi-currency entry.")
-    account_id = fields.Many2one('OASYS.account', string='Account', required=True, index=True,
+    account_id = fields.Many2one('oasys.account', string='Account', required=True, index=True,
                                  ondelete="cascade", domain=[('deprecated', '=', False)],
                                  default=lambda self: self._context.get('account_id', False))
-    move_id = fields.Many2one('OASYS.account.move', string='Journal Entry', ondelete="cascade",
+    move_id = fields.Many2one('oasys.account.move', string='Journal Entry', ondelete="cascade",
                                 help="The move of this entry line.", index=True, required=True, auto_join=True)
     narration = fields.Text(related='move_id.narration', string='Narration')
     reference = fields.Char(related='move_id.reference', string='Reference', store=True, copy=False, index=True)
-    journal_id = fields.Many2one('OASYS.journal', related='move_id.journal_id', string='Journal',
+    journal_id = fields.Many2one('oasys.journal', related='move_id.journal_id', string='Journal',
                                  index=True, store=True, copy=False)  # related is required
 
     date_maturity = fields.Date(string='Due date', index=True, required=True,
                                 help="This field is used for payable and receivable journal entries. You can put the limit date for the payment of this line.")
     date = fields.Date(related='move_id.date', string='Date', index=True, store=True, copy=False)  # related is required
-    tax_ids = fields.Many2many('OASYS.tax', string='Taxes',
+    tax_ids = fields.Many2many('oasys.tax', string='Taxes',
                                domain=['|', ('active', '=', False), ('active', '=', True)])
     company_id = fields.Many2one('res.company', related='account_id.company_id', string='Company', store=True)
     counterpart = fields.Char("Counterpart", compute='_get_counterpart',
                               help="Compute the counter part accounts of this journal item for this journal entry. This can be needed in reports.")
 
     # # TODO: put the invoice link and partner_id on the account_move
-    invoice_id = fields.Many2one('OASYS.invoice', oldname="invoice")
+    invoice_id = fields.Many2one('oasys.invoice', oldname="invoice")
     partner_id = fields.Many2one('res.partner', string='Partner', ondelete='restrict')
 
 

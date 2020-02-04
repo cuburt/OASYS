@@ -1,2 +1,2 @@
-# OASYS
+# oasys
 Online Accounting System

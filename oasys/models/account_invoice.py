@@ -27,7 +27,7 @@ TYPE2REFUND = {
 }
 
 class AccountInvoice(models.Model):
-    _name = 'OASYS.account.invoice'
+    _name = 'oasys.account.invoice'
     _description =  'Invoice'
     _order = "id desc"
 
@@ -38,7 +38,7 @@ class AccountInvoice(models.Model):
     @api.model
     def _default_journal(self):
         if self._context.get('default_journal_id', False):
-            return self.env['OASYS.journal'].browse(self._context.get('default_journal_id'))
+            return self.env['oasys.journal'].browse(self._context.get('default_journal_id'))
         inv_type = self._context.get('type', 'in_invoice')
         inv_types = inv_type if isinstance(inv_type, list) else [inv_type]
         company_id = self._context.get('company_id', self.env.user.company_id.id)
@@ -46,12 +46,12 @@ class AccountInvoice(models.Model):
             ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
             ('company_id', '=', company_id),
         ]
-        return self.env['OASYS.journal'].search(domain, limit=1)
+        return self.env['oasys.journal'].search(domain, limit=1)
 
     @api.model
     def _default_account(self):
         if self._context.get('default_account_type', False):
-            return self.env['OASYS.account'].search([('internal_type', '=', self.env.context['default_account_type'])],
+            return self.env['oasys.account'].search([('internal_type', '=', self.env.context['default_account_type'])],
                                               limit=1).id
 
     @api.model
@@ -107,21 +107,21 @@ class AccountInvoice(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
                                  required=True, readonly=True, states={'draft': [('readonly', False)]},
                                  track_visibility='always')
-    payment_term_id = fields.Many2one('OASYS.payment.term', string='Payment Terms', oldname='payment_term',
+    payment_term_id = fields.Many2one('oasys.payment.term', string='Payment Terms', oldname='payment_term',
                                       readonly=True, states={'draft': [('readonly', False)]},
                                       help="If you use payment terms, the due date will be computed automatically at the generation "
                                            "of accounting entries. If you keep the payment term and the due date empty, it means direct payment. "
                                            "The payment term may compute several due dates, for example 50% now, 50% in one month.")
-    account_id = fields.Many2one('OASYS.account', string='Account',
+    account_id = fields.Many2one('oasys.account', string='Account',
                                  required=True, readonly=True, states={'draft': [('readonly', False)]},
                                  domain=[('deprecated', '=', False)], help="The partner account used for this invoice.",
                                  default=_default_account)
-    invoice_line_ids = fields.One2many('OASYS.account.invoice.line', 'invoice_id', string='Invoice Lines',
+    invoice_line_ids = fields.One2many('oasys.account.invoice.line', 'invoice_id', string='Invoice Lines',
                                        oldname='invoice_line',
                                        readonly=True, states={'draft': [('readonly', False)]}, copy=True)
-    # tax_line_ids = fields.One2many('OASYS.invoice.tax', 'invoice_id', string='Tax Lines', oldname='tax_line',
+    # tax_line_ids = fields.One2many('oasys.invoice.tax', 'invoice_id', string='Tax Lines', oldname='tax_line',
     #                                readonly=True, states={'draft': [('readonly', False)]}, copy=True)
-    move_id = fields.Many2one('OASYS.account.move', string='Journal Entry',
+    move_id = fields.Many2one('oasys.account.move', string='Journal Entry',
                               readonly=True, index=True, ondelete='restrict', copy=False,
                               help="Link to the automatically generated Journal Items.")
     amount_untaxed = fields.Monetary(string='Untaxed Amount',
@@ -133,13 +133,13 @@ class AccountInvoice(models.Model):
                                   default=_default_currency, track_visibility='always')
     company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string="Company Currency",
                                           readonly=True)
-    journal_id = fields.Many2one('OASYS.journal', string='Journal',
+    journal_id = fields.Many2one('oasys.journal', string='Journal',
                                  required=True, readonly=True, states={'draft': [('readonly', False)]},
                                  default=_default_journal,
                                  domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale'], 'in_refund': ['purchase'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
     company_id = fields.Many2one('res.company', string='Company', change_default=True, related='journal_id.company_id',
                                  required=True, readonly=True, store=True,
-                                 default=lambda self: self.env['res.company']._company_default_get('OASYS.account.invoice'))
+                                 default=lambda self: self.env['res.company']._company_default_get('oasys.account.invoice'))
     partner_bank_id = fields.Many2one('res.partner.bank', string='Bank Account',
                                       help='Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Vendor Refund, otherwise a Partner bank account number.',
                                       readonly=True, states={'draft': [('readonly', False)]})
@@ -158,7 +158,7 @@ class AccountInvoice(models.Model):
 
     partner_company = fields.Char(related='partner_id.parent_id.commercial_company_name', string='Partner\'s Compnay', store=True)
     payments_widget = fields.Text(compute='_get_payment_info_JSON')
-    receipt_ids = fields.Many2many('OASYS.receipt','invoice_receipt_rel','invoice_id',string='Receipts')
+    receipt_ids = fields.Many2many('oasys.receipt','invoice_receipt_rel','invoice_id',string='Receipts')
 
     @api.depends('amount_untaxed','amount_tax','amount_total', 'invoice_line_ids')
     def _compute_amount(self):
@@ -179,7 +179,7 @@ class AccountInvoice(models.Model):
         for record in self:
             if record.state == 'open':
                 record.residual = record.amount_total
-                for receipt in self.env['OASYS.receipt'].search([('invoice_id','=',record.id),('invoice_no','=',record.number)]):
+                for receipt in self.env['oasys.receipt'].search([('invoice_id','=',record.id),('invoice_no','=',record.number)]):
                     if receipt and receipt.invoice_id == record.id and receipt.date == record.date_invoice:
                         record.residual = record.amount_total - receipt.amount
 
@@ -213,7 +213,7 @@ class AccountInvoice(models.Model):
         self.write({'state':'draft', 'date': False})
 
         try:
-            report_invoice = self.env['report']._get_report_from_name('OASYS.invoice_report')
+            report_invoice = self.env['report']._get_report_from_name('oasys.invoice_report')
         except IndexError:
             report_invoice = False
         return True
@@ -343,9 +343,9 @@ class AccountInvoice(models.Model):
                          'line_ids': [0,0, move_dict],
                          'narration': inv.comment}
             #raise UserError(_(str(move_dict)))
-            self.env['OASYS.account.move'].create(move_vals)
+            self.env['oasys.account.move'].create(move_vals)
             #raise UserError(_(str(move_vals)))
-            move = self.env['OASYS.account.move'].create(move_vals)
+            move = self.env['oasys.account.move'].create(move_vals)
             move.post()
             vals = {
                 'move_id': int(move.id),
@@ -358,7 +358,7 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_print(self):
         self.sent = True
-        return self.env['report'].get_action(self, 'OASYS.invoice_report')
+        return self.env['report'].get_action(self, 'oasys.invoice_report')
 
 
     # Delete func
@@ -370,7 +370,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def action_cancel(self):
-        moves = self.env['OASYS.account.move']
+        moves = self.env['oasys.account.move']
         for inv in self:
             if inv.move_id:
                 moves += inv.move_id
@@ -428,9 +428,9 @@ class AccountInvoice(models.Model):
         for inv in self:
             user_id = self.env['res.users'].search([('name','=',inv.partner_id.name)],order='id desc',limit=1).id
             company_id = inv.partner_id.parent_id.company_id.id
-            journal_id = self.env['OASYS.journal'].search([('type','=','purchase'),('company_id','=',company_id)], limit=1).id
-            account_id = self.env['OASYS.account'].search([('internal_type','=','payable'),('company_id','=',company_id)],limit=1).id
-            self.env['OASYS.account.invoice'].create({
+            journal_id = self.env['oasys.journal'].search([('type','=','purchase'),('company_id','=',company_id)], limit=1).id
+            account_id = self.env['oasys.account'].search([('internal_type','=','payable'),('company_id','=',company_id)],limit=1).id
+            self.env['oasys.account.invoice'].create({
                                                       'invoice_line_ids':inv.invoice_line_get(),
                                                       'sent':True,
                                                       'state':'open',
@@ -449,7 +449,7 @@ class AccountInvoice(models.Model):
                                                       'residual': inv.residual,
                                                       'amount_total':inv.amount_total
                                                       })
-            partner_invoice = self.env['OASYS.account.invoice'].search([('origin','=',str(inv.id))],limit=1)
+            partner_invoice = self.env['oasys.account.invoice'].search([('origin','=',str(inv.id))],limit=1)
             #partner_invoice.action_move_create()
 
         return True
@@ -471,14 +471,14 @@ class AccountInvoice(models.Model):
         return self.write({'sent':True,'state': 'open', 'date_invoice': fields.Date.context_today(self)})
 
 class AccountInvoiceLine(models.Model):
-    _name = 'OASYS.account.invoice.line'
+    _name = 'oasys.account.invoice.line'
     _description = 'Invoice Line'
     _order = " id"
 
     @api.model
     def _default_account(self):
         if self._context.get('journal_id'):
-            journal = self.env['OASYS.journal'].browse(self._context.get('journal_id'))
+            journal = self.env['oasys.journal'].browse(self._context.get('journal_id'))
             if self._context.get('type') in ('out_invoice', 'in_refund'):
                 return journal.default_credit_account_id.id
             return journal.default_debit_account_id.id
@@ -488,11 +488,11 @@ class AccountInvoiceLine(models.Model):
                          help="Reference of the document that produced this invoice.")
     sequence = fields.Integer(default=10,
                               help="Gives the sequence of this line when displaying the invoice.")
-    invoice_id = fields.Many2one('OASYS.account.invoice', string='Invoice Reference',
+    invoice_id = fields.Many2one('oasys.account.invoice', string='Invoice Reference',
                                  ondelete='cascade', index=True)
-    product_id = fields.Many2one('OASYS.product', string='Product',
+    product_id = fields.Many2one('oasys.product', string='Product',
                                  ondelete='restrict', index=True)
-    account_id = fields.Many2one('OASYS.account', string='Account',
+    account_id = fields.Many2one('oasys.account', string='Account',
                                  required=True, domain=[('deprecated', '=', False)],
                                  default=_default_account,
                                  help="The income or expense account related to the selected product.")
@@ -504,7 +504,7 @@ class AccountInvoiceLine(models.Model):
                             required=True, default=1)
     discount = fields.Float(string='Discount (%)', digits=dp.get_precision('Discount'),
                             default=0.0)
-    invoice_line_tax_ids = fields.Many2many('OASYS.tax',
+    invoice_line_tax_ids = fields.Many2many('oasys.tax',
                                             'account_invoice_line_tax', 'invoice_line_id', 'tax_id',
                                             string='Taxes',
                                             domain=[('type_tax_use', '!=', 'none'), '|', ('active', '=', False),
@@ -526,13 +526,13 @@ class AccountInvoiceLine(models.Model):
 
 
 class Receipt(models.Model):
-    _name = 'OASYS.receipt'
+    _name = 'oasys.receipt'
     _description = 'Cash Receipt'
     _order = 'date desc'
 
     @api.multi
     def _default_payment_method(self):
-        return self.env['OASYS.payment.method'].search([('payment_type','=','inbound'),('is_default','=',True)],limit=1).id
+        return self.env['oasys.payment.method'].search([('payment_type','=','inbound'),('is_default','=',True)],limit=1).id
 
     @api.multi
     def _get_invoice_id(self):
@@ -542,29 +542,29 @@ class Receipt(models.Model):
     @api.multi
     def _get_partner_id(self):
         if self.env.context.get('invoice_id'):
-            return self.env['OASYS.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).partner_id
+            return self.env['oasys.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).partner_id
 
     @api.multi
     def _get_partner_name(self):
         if self.env.context.get('invoice_id'):
-            return self.env['OASYS.account.invoice'].search(
+            return self.env['oasys.account.invoice'].search(
                 [('id', '=', int(self.env.context.get('invoice_id')))]).partner_id.name
 
     @api.multi
     def _get_partner_company(self):
         if self.env.context.get('invoice_id'):
-            return self.env['OASYS.account.invoice'].search(
+            return self.env['oasys.account.invoice'].search(
                 [('id', '=', int(self.env.context.get('invoice_id')))]).partner_id.parent_id.company_id
 
     @api.multi
     def _get_user_id(self):
         if self.env.context.get('invoice_id'):
-            return self.env['OASYS.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).user_id
+            return self.env['oasys.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).user_id
 
     @api.multi
     def _get_company_id(self):
         if self.env.context.get('invoice_id'):
-            return self.env['OASYS.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).company_id
+            return self.env['oasys.account.invoice'].search([('id','=',int(self.env.context.get('invoice_id')))]).company_id
     @api.multi
     def _get_invoice_no(self):
         if self.env.context.get('invoice_no'):
@@ -582,8 +582,8 @@ class Receipt(models.Model):
 
     name = fields.Char(string='OR Number:', required=False, readonly=True)
     date = fields.Datetime(string="Issued on:", default=fields.Date.context_today, readonly=True)
-    type = fields.Many2one('OASYS.payment.method',domain=[('payment_type','=','inbound')],string='Type of transaction', default=_default_payment_method)
-    invoice_id = fields.Many2one('OASYS.account.invoice',required=True, readonly=True, ondelete='cascade', index=True, default=_get_invoice_id)
+    type = fields.Many2one('oasys.payment.method',domain=[('payment_type','=','inbound')],string='Type of transaction', default=_default_payment_method)
+    invoice_id = fields.Many2one('oasys.account.invoice',required=True, readonly=True, ondelete='cascade', index=True, default=_get_invoice_id)
     partner_id = fields.Many2one('res.partner',related='invoice_id.partner_id',string='Partner', required=True, readonly=True, default = _get_partner_id)
     user_id = fields.Many2one('res.users',related='invoice_id.user_id',string='User', required=True, readonly=True, default = _get_user_id)
     invoice_no = fields.Char(related='invoice_id.number', string='Invoice Reference',store=True,default=_get_invoice_no)
@@ -591,7 +591,7 @@ class Receipt(models.Model):
     company_id = fields.Many2one('res.company',related='invoice_id.company_id', readonly=True, default=_get_company_id)
     currency_id = fields.Many2one('res.currency',related='company_id.currency_id')
     partner_company_id = fields.Many2one('res.company', related='partner_id.parent_id.company_id', readonly=True,default = _get_partner_company)
-    invoice_line_ids = fields.One2many('OASYS.account.invoice.line', 'invoice_id', string='Receipt Lines',
+    invoice_line_ids = fields.One2many('oasys.account.invoice.line', 'invoice_id', string='Receipt Lines',
                                        oldname='receipt_line',
                                        readonly=True, copy=True,related = 'invoice_id.invoice_line_ids', default=_get_invoice_lines)
     amount = fields.Monetary(currency_field='currency_id', string='Amount')
@@ -605,7 +605,7 @@ class Receipt(models.Model):
         record = super(Receipt, self).create(vals)
         company_id = record.company_id
         year = datetime.strptime(record.date, DEFAULT_SERVER_DATETIME_FORMAT).strftime('%y')
-        rec = self.env['OASYS.receipt'].search(
+        rec = self.env['oasys.receipt'].search(
             [('company_id', '=', company_id.id), ('id', '=', record.id)], order='id desc', limit=1).id
         if rec:
             val = rec + 1
@@ -617,19 +617,19 @@ class Receipt(models.Model):
         if diff == 0.0:
             state = 'paid'
 
-        self.env['OASYS.account.invoice'].search([('id','=',record.invoice_id.id),('number','=',record.invoice_no)], limit=1).write({'receipt_ids': (4,[record.id]),'residual':diff,'state': state})
+        self.env['oasys.account.invoice'].search([('id','=',record.invoice_id.id),('number','=',record.invoice_no)], limit=1).write({'receipt_ids': (4,[record.id]),'residual':diff,'state': state})
 
         return record
 
 # class AccountInvoiceTax(models.Model):
-#     _name = 'OASYS.invoice.tax'
+#     _name = 'oasys.invoice.tax'
 #     _description = 'Invoice Tax'
 #     _order = 'sequence'
 #
-#     invoice_id = fields.Many2one('OASYS.account.invoice', string='Invoice', ondelete='cascade', index=True)
+#     invoice_id = fields.Many2one('oasys.account.invoice', string='Invoice', ondelete='cascade', index=True)
 #     name = fields.Char(string='Tax Description', required=True, related='tax_id.description')
-#     tax_id = fields.Many2one('OASYS.tax', string='Tax', ondelete='restrict')
-#     account_id = fields.Many2one('OASYS.account', string='Tax Account', required=True,
+#     tax_id = fields.Many2one('oasys.tax', string='Tax', ondelete='restrict')
+#     account_id = fields.Many2one('oasys.account', string='Tax Account', required=True,
 #                                  domain=[('deprecated', '=', False)], related='tax_id.account_id')
 #     amount = fields.Monetary()
 #     manual = fields.Boolean(default=False)
@@ -642,7 +642,7 @@ class Receipt(models.Model):
 
 
 class AccountPaymentTerm(models.Model):
-    _name = 'OASYS.payment.term'
+    _name = 'oasys.payment.term'
     _description = 'Payment Term'
     _order = 'name'
 
@@ -654,20 +654,20 @@ class AccountPaymentTerm(models.Model):
     active = fields.Boolean(default=True,
                             help="If the active field is set to False, it will allow you to hide the payment term without removing it.")
     note = fields.Text(string='Description on the Invoice', translate=True)
-    line_ids = fields.One2many('OASYS.payment.term.line', 'payment_id', string='Terms', copy=True,
+    line_ids = fields.One2many('oasys.payment.term.line', 'payment_id', string='Terms', copy=True,
                                default=_default_line_ids)
     company_id = fields.Many2one('res.company', string='Company', required=True,
                                  default=lambda self: self.env.user.company_id)
 
 class AccountPaymentTermLine(models.Model):
-    _name = 'OASYS.payment.term.line'
+    _name = 'oasys.payment.term.line'
     _description = 'Payment term Line'
     _order = 'sequence, id'
 
     @api.multi
     def _get_default_payment(self):
         if self.env.context.get('default_payment_id'):
-            return self.env['OASYS.payment.term'].search(
+            return self.env['oasys.payment.term'].search(
                 [('id', '=', self.env.context['default_payment_id'])], limit=1).id
 
     value = fields.Selection([
@@ -687,7 +687,7 @@ class AccountPaymentTermLine(models.Model):
     ],
         default='day_after_invoice_date', required=True, string='Options'
     )
-    payment_id = fields.Many2one('OASYS.payment.term', string='Payment Terms', required=True, index=True,
+    payment_id = fields.Many2one('oasys.payment.term', string='Payment Terms', required=True, index=True,
                                  ondelete='cascade')
     sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
 

@@ -7,7 +7,7 @@ from datetime import datetime
 import odoo.addons.decimal_precision as dp
 
 class Product(models.Model):
-    _name = 'OASYS.product'
+    _name = 'oasys.product'
     _description = 'Product'
 
     name = fields.Char(string="Product Name")
@@ -23,7 +23,7 @@ class Product(models.Model):
     brand = fields.Char(string='Brand')
     default_code = fields.Char(string="Internal Reference", readonly=True)
     barcode = fields.Char(string="Barcode")
-    category_id = fields.Many2one('OASYS.product.category', string='Internal Category', required=True)
+    category_id = fields.Many2one('oasys.product.category', string='Internal Category', required=True)
     list_price = fields.Monetary(string="Sale Price", currency_field="currency_id")
     standard_price = fields.Monetary(string="Cost", currency_field="currency_id")
     company_id = fields.Many2one('res.company', string="Company", related='category_id.company_id')
@@ -41,7 +41,7 @@ class Product(models.Model):
         product_id = record.id
         date = datetime.strptime(fields.Date.context_today(self), DEFAULT_SERVER_DATE_FORMAT)
         year = date.strftime('%y')
-        rec = self.env['OASYS.product'].search(
+        rec = self.env['oasys.product'].search(
             [('company_id', '=', company_id.id), ('id','=',product_id)],order='id desc', limit=1).id
         if rec:
             val = rec + 1
@@ -52,12 +52,12 @@ class Product(models.Model):
         return record
 
 class ProductCategory(models.Model):
-    _name = 'OASYS.product.category'
+    _name = 'oasys.product.category'
     _description = 'Product Category'
 
     name = fields.Char(string='Category Name', required=True)
-    parent_id = fields.Many2one('OASYS.product.category',string="Parent Category")
-    company_id = fields.Many2one('res.company', string="Company", default= lambda self: self.env['res.company']._company_default_get('OASYS.product.category'))
+    parent_id = fields.Many2one('oasys.product.category',string="Parent Category")
+    company_id = fields.Many2one('res.company', string="Company", default= lambda self: self.env['res.company']._company_default_get('oasys.product.category'))
     type = fields.Selection([('view','View'),
                              ('normal','Normal')], string='Category Type')
 

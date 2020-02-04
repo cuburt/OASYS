@@ -269,7 +269,7 @@
 <!--                                        <field name="tax_id" invisible="1"/>-->
 <!--                                        &lt;!&ndash;                                                                    <field name="account_analytic_id" invisible="1"/>&ndash;&gt;-->
 <!--                                        <field name="manual" invisible="1"/>-->
-<!--                                        <field name="account_id" groups="OASYS.group_oasys_user"/>-->
+<!--                                        <field name="account_id" groups="oasys.group_oasys_user"/>-->
 <!--                                        <field name="amount"/>-->
 <!--                                        <field name="currency_id" invisible="1"/>-->
 <!--                                    </tree>-->
@@ -291,9 +291,9 @@
                         <button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="oasys.group_oasys_user"/>
 
 
-                        <!--                        <button name="action_invoice_open" type="object" states="draft" string="Validate" class="oe_highlight" groups="OASYS.group_oasys_user"/>-->
-                        <!--                        <button name="action_invoice_cancel" type="object" states="draft,proforma2,open" string="Cancel Invoice" groups="OASYS.group_oasys_accountant"/>-->
-                        <!--                        <button name="action_invoice_draft" states="cancel" string="Reset to Draft" type="object" groups="OASYS.group_oasys_accountant"/>-->
+                        <!--                        <button name="action_invoice_open" type="object" states="draft" string="Validate" class="oe_highlight" groups="oasys.group_oasys_user"/>-->
+                        <!--                        <button name="action_invoice_cancel" type="object" states="draft,proforma2,open" string="Cancel Invoice" groups="oasys.group_oasys_accountant"/>-->
+                        <!--                        <button name="action_invoice_draft" states="cancel" string="Reset to Draft" type="object" groups="oasys.group_oasys_accountant"/>-->
 
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="open,paid"/>
                     </header>
@@ -415,7 +415,7 @@
                 <p class="oe_view_nocontent_create">
                     Click to create a customer invoice.
                 </p><p>
-                OASYS's electronic invoicing allows to ease and fasten the collection of customer payments. Your customer receives the invoice by email and he can pay online and/or import it in his own system.
+                oasys's electronic invoicing allows to ease and fasten the collection of customer payments. Your customer receives the invoice by email and he can pay online and/or import it in his own system.
                 The discussions with your customer are automatically displayed at the bottom of each invoice.
             </p>
             </field>

@@ -196,7 +196,7 @@
                 </p><p>
                 A journal item is the initial entry in accounting and it consists of either a debit or a credit transaction.
             </p><p>
-                OASYS automatically creates one journal item based on transaction.
+                oasys automatically creates one journal item based on transaction.
             </p>
             </field>
         </record>
