@@ -20,11 +20,11 @@
                   sequence="1"
                   web_icon="oasys,static/description/icon.png"/>
 
-<!--        <menuitem id="menu_dashboard"-->
-<!--                  name="Dashboard"-->
-<!--                  parent="oasys.menu_root"-->
-<!--                  action="oasys.action_window_company_profile"-->
-<!--                  sequence="1"/>-->
+        <menuitem id="menu_dashboard"
+                  name="Dashboard"
+                  parent="oasys.menu_root"
+                  action="oasys.action_window_dashboard"
+                  sequence="1"/>
 
         <menuitem id="menu_revenue"
                   name="Sales"

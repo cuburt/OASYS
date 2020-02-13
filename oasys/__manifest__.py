@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','report','oasys_product'],
+    'depends': ['base','report','oasys_product','oasys_analytics'],
 
     # always loaded
     'data': [
@@ -37,6 +37,7 @@
         'views/account_receipt.xml',
         'views/account_invoice.xml',
         'views/account_view.xml',
+        'views/visualisation.xml',
         'views/views.xml',
         # 'views/accounts_accounts.xmls',
         # 'views/templates.xml',

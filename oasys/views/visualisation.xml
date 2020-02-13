@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+<!--        <record id="visualisation" model="ir.ui.view">-->
+<!--            <field name="name">oasys.visualisation.dashboard</field>-->
+<!--            <field name="model">oasys.visualisation</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <form>-->
+<!--                    <sheet>-->
+<!--                        <field name="graph_image" nolabel="1" widget="image"/>-->
+<!--                    </sheet>-->
+<!--                </form>-->
+<!--            </field>-->
+<!--        </record>-->
+
+        <record id="visualisation" model="ir.ui.view">
+            <field name="name">oasys.visualisation.dashboard</field>
+            <field name="model">oasys.visualisation</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card">
+                                <field name="graph_image" nolabel="1" widget="image"/>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+       <record id="oasys.action_window_dashboard" model="ir.actions.act_window">
+           <field name="name">Data Visualization</field>
+           <field name="type">ir.actions.act_window</field>
+           <field name="res_model">oasys.visualisation</field>
+           <field name="view_mode">kanban</field>
+           <field name="view_id" ref="visualisation"/>
+           <field name="help" type="html">
+             <p class="oe_view_nocontent_create">
+               <!-- Add Text Here -->
+             </p><p>
+               <!-- More details about what a user can do with this object will be OK -->
+             </p>
+           </field>
+       </record>
+    </data>
+</odoo>
