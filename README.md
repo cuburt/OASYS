@@ -1,2 +1,2 @@
 # oasys
-Online Accounting System
+Online Accounting System powered by Odoo
